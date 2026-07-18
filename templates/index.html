@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Chat Messaging System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="app">
+        <section class="panel">
+            <h1>Customer Chat Messaging System</h1>
+
+            <label for="submitQueue">Submit Queue</label>
+            <select id="submitQueue" class="queue-select">
+                <option value="technical-support">Technical Support</option>
+                <option value="sales-chat">Sales Chat</option>
+                <option value="customer-feedback">Customer Feedback</option>
+            </select>
+
+            <form id="messageForm" class="message-form"></form>
+
+            <div class="actions">
+                <div class="action-row">
+                    <select class="queue-select" data-for="/submit">
+                        <option value="technical-support">Technical Support</option>
+                        <option value="sales-chat">Sales Chat</option>
+                        <option value="customer-feedback">Customer Feedback</option>
+                    </select>
+                    <button type="button" data-action="/submit">Submit</button>
+                </div>
+                <div class="action-row">
+                    <select class="queue-select" data-for="/receive-one">
+                        <option value="technical-support">Technical Support</option>
+                        <option value="sales-chat">Sales Chat</option>
+                        <option value="customer-feedback">Customer Feedback</option>
+                    </select>
+                    <button type="button" data-action="/receive-one">Receive One</button>
+                </div>
+                <div class="action-row">
+                    <select class="queue-select" data-for="/receive-all">
+                        <option value="technical-support">Technical Support</option>
+                        <option value="sales-chat">Sales Chat</option>
+                        <option value="customer-feedback">Customer Feedback</option>
+                    </select>
+                    <button type="button" data-action="/receive-all">Receive All</button>
+                </div>
+                <div class="action-row">
+                    <select class="queue-select" data-for="/peek-one">
+                        <option value="technical-support">Technical Support</option>
+                        <option value="sales-chat">Sales Chat</option>
+                        <option value="customer-feedback">Customer Feedback</option>
+                    </select>
+                    <button type="button" data-action="/peek-one">Peek One</button>
+                </div>
+                <div class="action-row">
+                    <select class="queue-select" data-for="/peek-all">
+                        <option value="technical-support">Technical Support</option>
+                        <option value="sales-chat">Sales Chat</option>
+                        <option value="customer-feedback">Customer Feedback</option>
+                    </select>
+                    <button type="button" data-action="/peek-all">Peek All</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="output">
+            <h2>Result</h2>
+            <pre id="result">Select a queue and choose an action.</pre>
+        </section>
+    </main>
+
+    <script>
+        const fieldsByQueue = {
+            "technical-support": [
+                ["customer", "Customer Name", "John"],
+                ["issue", "Issue Description", "Login problem"],
+                ["priority", "Priority", "High"]
+            ],
+            "sales-chat": [
+                ["customer", "Customer Name", "Priya"],
+                ["product", "Product Interested", "Premium Plan"],
+                ["contact", "Contact Number", "9876543210"]
+            ],
+            "customer-feedback": [
+                ["customer", "Customer Name", "Alex"],
+                ["feedback", "Feedback", "Great support experience"],
+                ["rating", "Rating", "5"]
+            ]
+        };
+
+        const submitQueue = document.getElementById("submitQueue");
+        const form = document.getElementById("messageForm");
+        const result = document.getElementById("result");
+
+        function renderFields() {
+            const fields = fieldsByQueue[submitQueue.value];
+            form.innerHTML = fields.map(([name, label, placeholder]) => `
+                <label for="${name}">${label}</label>
+                <input id="${name}" name="${name}" placeholder="${placeholder}">
+            `).join("");
+        }
+
+        function payloadFromForm() {
+            return Object.fromEntries(new FormData(form).entries());
+        }
+
+        async function runAction(action, queue) {
+            result.textContent = "Working...";
+            const body = {
+                queue,
+                payload: payloadFromForm()
+            };
+
+            try {
+                const response = await fetch(action, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = error.message;
+            }
+        }
+
+        document.querySelectorAll(".actions button").forEach((button) => {
+            button.addEventListener("click", () => {
+                const row = button.closest(".action-row");
+                const queue = row.querySelector("select").value;
+                runAction(button.dataset.action, queue);
+            });
+        });
+
+        document.querySelector('[data-for="/submit"]').addEventListener("change", (event) => {
+            submitQueue.value = event.target.value;
+            renderFields();
+        });
+        submitQueue.addEventListener("change", () => {
+            document.querySelector('[data-for="/submit"]').value = submitQueue.value;
+            renderFields();
+        });
+        renderFields();
+    </script>
+</body>
+</html>
