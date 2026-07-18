@@ -20,73 +20,99 @@
             </div>
         </header>
 
-        <section class="panel">
-            <div class="section-title">
-                <h2>Compose Message</h2>
-                <span id="activeQueueLabel">Technical Support</span>
+        <section class="metrics" aria-label="Queue metrics">
+            <div class="metric-card total">
+                <span>Total Active</span>
+                <strong id="totalActive">-</strong>
             </div>
-
-            <label for="submitQueue">Submit Queue</label>
-            <select id="submitQueue" class="queue-select">
-                <option value="technical-support">Technical Support</option>
-                <option value="sales-chat">Sales Chat</option>
-                <option value="customer-feedback">Customer Feedback</option>
-            </select>
-
-            <form id="messageForm" class="message-form"></form>
-
-            <h2 class="actions-title">Queue Actions</h2>
-            <div class="actions">
-                <div class="action-row">
-                    <select class="queue-select" data-for="/submit">
-                        <option value="technical-support">Technical Support</option>
-                        <option value="sales-chat">Sales Chat</option>
-                        <option value="customer-feedback">Customer Feedback</option>
-                    </select>
-                    <button type="button" data-action="/submit">Submit</button>
-                </div>
-                <div class="action-row">
-                    <select class="queue-select" data-for="/receive-one">
-                        <option value="technical-support">Technical Support</option>
-                        <option value="sales-chat">Sales Chat</option>
-                        <option value="customer-feedback">Customer Feedback</option>
-                    </select>
-                    <button type="button" data-action="/receive-one">Receive One</button>
-                </div>
-                <div class="action-row">
-                    <select class="queue-select" data-for="/receive-all">
-                        <option value="technical-support">Technical Support</option>
-                        <option value="sales-chat">Sales Chat</option>
-                        <option value="customer-feedback">Customer Feedback</option>
-                    </select>
-                    <button type="button" data-action="/receive-all">Receive All</button>
-                </div>
-                <div class="action-row">
-                    <select class="queue-select" data-for="/peek-one">
-                        <option value="technical-support">Technical Support</option>
-                        <option value="sales-chat">Sales Chat</option>
-                        <option value="customer-feedback">Customer Feedback</option>
-                    </select>
-                    <button type="button" data-action="/peek-one">Peek One</button>
-                </div>
-                <div class="action-row">
-                    <select class="queue-select" data-for="/peek-all">
-                        <option value="technical-support">Technical Support</option>
-                        <option value="sales-chat">Sales Chat</option>
-                        <option value="customer-feedback">Customer Feedback</option>
-                    </select>
-                    <button type="button" data-action="/peek-all">Peek All</button>
-                </div>
+            <div class="metric-card">
+                <span>Technical Support</span>
+                <strong id="metric-technical-support">-</strong>
             </div>
+            <div class="metric-card">
+                <span>Sales Chat</span>
+                <strong id="metric-sales-chat">-</strong>
+            </div>
+            <div class="metric-card">
+                <span>Customer Feedback</span>
+                <strong id="metric-customer-feedback">-</strong>
+            </div>
+            <button class="refresh-button" type="button" id="refreshMetrics">Refresh</button>
         </section>
 
-        <section class="output">
-            <div class="section-title">
-                <h2>Result</h2>
-                <span id="statusBadge">Ready</span>
-            </div>
-            <pre id="result">Select a queue and choose an action.</pre>
-        </section>
+        <div class="workspace">
+            <section class="panel">
+                <div class="section-title">
+                    <h2>Compose Message</h2>
+                    <span id="activeQueueLabel">Technical Support</span>
+                </div>
+
+                <div class="submit-row">
+                    <div>
+                        <label for="submitQueue">Submit Queue</label>
+                        <select id="submitQueue" class="queue-select">
+                            <option value="technical-support">Technical Support</option>
+                            <option value="sales-chat">Sales Chat</option>
+                            <option value="customer-feedback">Customer Feedback</option>
+                        </select>
+                    </div>
+                </div>
+
+                <form id="messageForm" class="message-form"></form>
+
+                <h2 class="actions-title">Queue Actions</h2>
+                <div class="actions">
+                    <div class="action-row">
+                        <button type="button" data-action="/submit">Submit</button>
+                        <select class="queue-select" data-for="/submit">
+                            <option value="technical-support">Technical Support</option>
+                            <option value="sales-chat">Sales Chat</option>
+                            <option value="customer-feedback">Customer Feedback</option>
+                        </select>
+                    </div>
+                    <div class="action-row">
+                        <button type="button" data-action="/receive-one">Receive One</button>
+                        <select class="queue-select" data-for="/receive-one">
+                            <option value="technical-support">Technical Support</option>
+                            <option value="sales-chat">Sales Chat</option>
+                            <option value="customer-feedback">Customer Feedback</option>
+                        </select>
+                    </div>
+                    <div class="action-row">
+                        <button type="button" data-action="/receive-all">Receive All</button>
+                        <select class="queue-select" data-for="/receive-all">
+                            <option value="technical-support">Technical Support</option>
+                            <option value="sales-chat">Sales Chat</option>
+                            <option value="customer-feedback">Customer Feedback</option>
+                        </select>
+                    </div>
+                    <div class="action-row">
+                        <button type="button" data-action="/peek-one">Peek One</button>
+                        <select class="queue-select" data-for="/peek-one">
+                            <option value="technical-support">Technical Support</option>
+                            <option value="sales-chat">Sales Chat</option>
+                            <option value="customer-feedback">Customer Feedback</option>
+                        </select>
+                    </div>
+                    <div class="action-row">
+                        <button type="button" data-action="/peek-all">Peek All</button>
+                        <select class="queue-select" data-for="/peek-all">
+                            <option value="technical-support">Technical Support</option>
+                            <option value="sales-chat">Sales Chat</option>
+                            <option value="customer-feedback">Customer Feedback</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="output">
+                <div class="section-title">
+                    <h2>Result</h2>
+                    <span id="statusBadge">Ready</span>
+                </div>
+                <pre id="result">Select a queue and choose an action.</pre>
+            </section>
+        </div>
     </main>
 
     <script>
@@ -113,6 +139,7 @@
         const result = document.getElementById("result");
         const statusBadge = document.getElementById("statusBadge");
         const activeQueueLabel = document.getElementById("activeQueueLabel");
+        const refreshMetricsButton = document.getElementById("refreshMetrics");
 
         function optionLabel(value) {
             return document.querySelector(`#submitQueue option[value="${value}"]`).textContent;
@@ -131,6 +158,31 @@
 
         function payloadFromForm() {
             return Object.fromEntries(new FormData(form).entries());
+        }
+
+        async function loadMetrics() {
+            refreshMetricsButton.disabled = true;
+
+            try {
+                const response = await fetch("/metrics");
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Unable to load metrics.");
+                }
+
+                document.getElementById("totalActive").textContent = data.total_active;
+                data.queues.forEach((queue) => {
+                    document.getElementById(`metric-${queue.name}`).textContent = queue.active;
+                });
+            } catch (error) {
+                document.getElementById("totalActive").textContent = "!";
+                Object.keys(fieldsByQueue).forEach((queueName) => {
+                    document.getElementById(`metric-${queueName}`).textContent = "!";
+                });
+            } finally {
+                refreshMetricsButton.disabled = false;
+            }
         }
 
         async function runAction(action, queue) {
@@ -160,6 +212,7 @@
                 statusBadge.className = "error";
             } finally {
                 buttons.forEach((button) => button.disabled = false);
+                loadMetrics();
             }
         }
 
@@ -179,7 +232,9 @@
             document.querySelector('[data-for="/submit"]').value = submitQueue.value;
             renderFields();
         });
+        refreshMetricsButton.addEventListener("click", loadMetrics);
         renderFields();
+        loadMetrics();
     </script>
 </body>
 </html>

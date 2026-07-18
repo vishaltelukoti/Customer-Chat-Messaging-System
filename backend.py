@@ -2,6 +2,7 @@ import json
 import os
 
 from azure.servicebus import ServiceBusClient, ServiceBusMessage
+from azure.servicebus.management import ServiceBusAdministrationClient
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 
@@ -33,6 +34,14 @@ def get_client():
     return ServiceBusClient.from_connection_string(CONNECTION_STRING)
 
 
+def get_admin_client():
+    if not CONNECTION_STRING:
+        raise RuntimeError(
+            "Set AZURE_SERVICE_BUS_CONNECTION_STRING before using Azure Service Bus."
+        )
+    return ServiceBusAdministrationClient.from_connection_string(CONNECTION_STRING)
+
+
 def validate_queue(queue_name):
     if queue_name not in QUEUES:
         raise ValueError("Unknown queue selected.")
@@ -49,6 +58,32 @@ def parse_message(message):
 @app.route("/")
 def index():
     return render_template("index.html", queues=QUEUES)
+
+
+@app.get("/metrics")
+def metrics():
+    queues = []
+
+    with get_admin_client() as admin_client:
+        for queue_name in QUEUES:
+            properties = admin_client.get_queue_runtime_properties(queue_name)
+            queues.append(
+                {
+                    "name": queue_name,
+                    "active": properties.active_message_count,
+                    "dead_letter": properties.dead_letter_message_count,
+                    "total": properties.total_message_count,
+                }
+            )
+
+    return jsonify(
+        {
+            "queues": queues,
+            "total_active": sum(queue["active"] for queue in queues),
+            "total_dead_letter": sum(queue["dead_letter"] for queue in queues),
+            "total_messages": sum(queue["total"] for queue in queues),
+        }
+    )
 
 
 @app.post("/submit")
