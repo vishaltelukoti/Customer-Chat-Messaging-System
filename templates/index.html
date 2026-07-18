@@ -8,8 +8,23 @@
 </head>
 <body>
     <main class="app">
+        <header class="app-header">
+            <div>
+                <p class="eyebrow">Azure Service Bus POC</p>
+                <h1>Customer Chat Messaging System</h1>
+            </div>
+            <div class="queue-pills" aria-label="Available queues">
+                <span>technical-support</span>
+                <span>sales-chat</span>
+                <span>customer-feedback</span>
+            </div>
+        </header>
+
         <section class="panel">
-            <h1>Customer Chat Messaging System</h1>
+            <div class="section-title">
+                <h2>Compose Message</h2>
+                <span id="activeQueueLabel">Technical Support</span>
+            </div>
 
             <label for="submitQueue">Submit Queue</label>
             <select id="submitQueue" class="queue-select">
@@ -20,6 +35,7 @@
 
             <form id="messageForm" class="message-form"></form>
 
+            <h2 class="actions-title">Queue Actions</h2>
             <div class="actions">
                 <div class="action-row">
                     <select class="queue-select" data-for="/submit">
@@ -65,7 +81,10 @@
         </section>
 
         <section class="output">
-            <h2>Result</h2>
+            <div class="section-title">
+                <h2>Result</h2>
+                <span id="statusBadge">Ready</span>
+            </div>
             <pre id="result">Select a queue and choose an action.</pre>
         </section>
     </main>
@@ -92,12 +111,21 @@
         const submitQueue = document.getElementById("submitQueue");
         const form = document.getElementById("messageForm");
         const result = document.getElementById("result");
+        const statusBadge = document.getElementById("statusBadge");
+        const activeQueueLabel = document.getElementById("activeQueueLabel");
+
+        function optionLabel(value) {
+            return document.querySelector(`#submitQueue option[value="${value}"]`).textContent;
+        }
 
         function renderFields() {
             const fields = fieldsByQueue[submitQueue.value];
+            activeQueueLabel.textContent = optionLabel(submitQueue.value);
             form.innerHTML = fields.map(([name, label, placeholder]) => `
-                <label for="${name}">${label}</label>
-                <input id="${name}" name="${name}" placeholder="${placeholder}">
+                <div class="field">
+                    <label for="${name}">${label}</label>
+                    <input id="${name}" name="${name}" placeholder="${placeholder}" autocomplete="off">
+                </div>
             `).join("");
         }
 
@@ -106,6 +134,10 @@
         }
 
         async function runAction(action, queue) {
+            const buttons = document.querySelectorAll(".actions button");
+            buttons.forEach((button) => button.disabled = true);
+            statusBadge.textContent = "Working";
+            statusBadge.className = "working";
             result.textContent = "Working...";
             const body = {
                 queue,
@@ -120,8 +152,14 @@
                 });
                 const data = await response.json();
                 result.textContent = JSON.stringify(data, null, 2);
+                statusBadge.textContent = response.ok ? "Success" : "Error";
+                statusBadge.className = response.ok ? "success" : "error";
             } catch (error) {
                 result.textContent = error.message;
+                statusBadge.textContent = "Error";
+                statusBadge.className = "error";
+            } finally {
+                buttons.forEach((button) => button.disabled = false);
             }
         }
 
